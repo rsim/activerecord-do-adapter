@@ -1,0 +1,13 @@
+History.txt
+Manifest.txt
+PostInstall.txt
+README.rdoc
+Rakefile
+lib/activerecord-do-adapter.rb
+script/console
+script/destroy
+script/generate
+spec/activerecord-do-adapter_spec.rb
+spec/spec.opts
+spec/spec_helper.rb
+tasks/rspec.rake
