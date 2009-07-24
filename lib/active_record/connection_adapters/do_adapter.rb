@@ -1,0 +1,159 @@
+require 'active_record/connection_adapters/abstract_adapter'
+require 'data_objects'
+
+module ActiveRecord
+  class Base
+    # Establishes a connection to the database that's used by all Active Record objects.
+    def self.do_connection(config) # :nodoc:
+      config = config.symbolize_keys
+      scheme   = config[:scheme]
+      host     = config[:host]
+      port     = config[:port]
+      username = config[:username]
+      password = config[:password]
+      database = config[:database]
+      
+      uri = config[:uri] ||"#{scheme}://#{username}:#{password}@#{host}:#{port}/#{database}"
+
+      ConnectionAdapters::DoAdapter.new(uri, logger, config)
+    end
+  end
+
+  module ConnectionAdapters
+    class DoColumn < Column #:nodoc:
+    end
+
+    class DoAdapter < AbstractAdapter
+
+      def initialize(uri, logger, config)
+        super(nil, logger)
+        @uri = uri
+        @config = config
+        connect
+      end
+
+      def adapter_name #:nodoc:
+        'do'
+      end
+
+      def supports_migrations? #:nodoc:
+        true
+      end
+
+      # QUOTING ==================================================
+      def quote(value, column = nil)
+        @connection.quote_value(value)
+      end
+
+      def quote_string(value)
+        value.gsub("'", "''")
+      end
+
+
+      # REFERENTIAL INTEGRITY ====================================
+
+      # CONNECTION MANAGEMENT ====================================
+
+      def active?
+        reader = @connection.create_command(active_select_statement).execute_reader
+        reader.close
+        true
+      rescue
+        false
+      end
+
+      def reconnect!
+        disconnect!
+        connect
+      end
+
+      def disconnect!
+        @connection.dispose rescue nil
+      end
+
+      # DATABASE STATEMENTS ======================================
+
+      # Returns an array of arrays containing the field values.
+      # Order is the same as that returned by +columns+.
+      def select_rows(sql, name = nil)
+        log(sql, name) do
+          reader = @connection.create_command(sql).execute_reader
+          rows = []
+          begin
+            while reader.next!
+              rows << reader.values
+            end
+          ensure
+            reader.close
+          end
+          rows
+        end
+      end
+
+      # Executes the SQL statement in the context of this connection.
+      def execute(sql, name = nil)
+        log(sql, name) do
+          @connection.create_command(sql).execute_non_query
+        end
+      end
+
+      def begin_db_transaction #:nodoc:
+        execute "BEGIN"
+      end
+
+      def commit_db_transaction #:nodoc:
+        execute "COMMIT"
+      end
+
+      def rollback_db_transaction #:nodoc:
+        execute "ROLLBACK"
+      end
+
+      # SCHEMA STATEMENTS ========================================
+
+
+      protected
+
+      def translate_exception(exception, message)
+      end
+
+      # Returns an array of record hashes with the column names as keys and
+      # column values as values.
+      def select(sql, name = nil)
+        log(sql, name) do
+          reader = @connection.create_command(sql).execute_reader
+          fields = reader.fields
+          rows = []
+          begin
+            while reader.next!
+              i = -1
+              rows << Hash[*reader.values.map{|v| i+=1; [fields[i], v]}.flatten]
+            end
+          ensure
+            reader.close
+          end
+          rows
+        end
+      end
+
+      # Returns the last auto-generated ID from the affected table.
+      def insert_sql(sql, name = nil, pk = nil, id_value = nil, sequence_name = nil) #:nodoc:
+        result = execute(sql, name)
+        id_value || result.insert_id
+      end
+
+      # Executes the update statement and returns the number of rows affected.
+      def update_sql(sql, name = nil) #:nodoc:
+        result = execute(sql, name)
+        result.to_i
+      end
+
+      private
+
+      def connect
+        @connection = DataObjects::Connection.new(@uri)
+      end
+
+    end
+  end
+end
