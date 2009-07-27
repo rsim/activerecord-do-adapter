@@ -97,17 +97,24 @@ module ActiveRecord
         end
       end
 
-      def begin_db_transaction #:nodoc:
-        execute "BEGIN"
-      end
-
-      def commit_db_transaction #:nodoc:
-        execute "COMMIT"
-      end
-
-      def rollback_db_transaction #:nodoc:
-        execute "ROLLBACK"
-      end
+      # TODO: waiting when DataObjects Transaction API can be used with existing connection
+      # def begin_db_transaction #:nodoc:
+      # end
+      # 
+      # def commit_db_transaction #:nodoc:
+      # end
+      # 
+      # def rollback_db_transaction #:nodoc:
+      # end
+      # 
+      # def create_savepoint
+      # end
+      # 
+      # def rollback_to_savepoint
+      # end
+      # 
+      # def release_savepoint
+      # end
 
       # SCHEMA STATEMENTS ========================================
 

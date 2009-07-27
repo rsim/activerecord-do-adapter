@@ -97,8 +97,29 @@ module ActiveRecord
         end
       end
 
+      def begin_db_transaction #:nodoc:
+        execute "BEGIN"
+      end
 
+      def commit_db_transaction #:nodoc:
+        execute "COMMIT"
+      end
 
+      def rollback_db_transaction #:nodoc:
+        execute "ROLLBACK"
+      end
+
+      def create_savepoint
+        execute("SAVEPOINT #{current_savepoint_name}")
+      end
+      
+      def rollback_to_savepoint
+        execute("ROLLBACK TO SAVEPOINT #{current_savepoint_name}")
+      end
+      
+      def release_savepoint
+        execute("RELEASE SAVEPOINT #{current_savepoint_name}")
+      end
 
       # SCHEMA STATEMENTS ========================================
 
