@@ -4,7 +4,9 @@
 
 == DESCRIPTION:
 
-FIX (describe your package)
+This is experimental ActiveRecord DataObjects adapter.
+It uses DataObjects drivers to access database.
+Currently experimental MySQL DataObjects adapter is created.
 
 == FEATURES/PROBLEMS:
 
@@ -20,7 +22,9 @@ FIX (describe your package)
 
 == INSTALL:
 
-* FIX (sudo gem install, anything else)
+* git clone git://github.com/rsim/activerecord-do-adapter.git
+* cd activerecord-do-adapter
+* rake install_gem
 
 == LICENSE:
 
