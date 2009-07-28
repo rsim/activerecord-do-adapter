@@ -21,6 +21,36 @@ module ActiveRecord
 
   module ConnectionAdapters
     class DoColumn < Column #:nodoc:
+
+      # # Casts value (which is a String) to an appropriate instance.
+      # def type_cast(value)
+      #   return nil if value.nil?
+      #   case type
+      #     # cast Extlib::ByteArray to String
+      #     when :text      then value.to_s
+      #     else super
+      #   end
+      # end
+      # 
+      # def type_cast_code(var_name)
+      #   case type
+      #     when :text      then "#{var_name}.to_s"
+      #     else super
+      #   end
+      # end
+
+      # Convert DataObjects returned value to time
+      def self.string_to_time(value)
+        if value.is_a?(DateTime)
+          begin
+            return value.to_time
+          rescue ArgumentError
+            return value
+          end
+        end
+        super
+      end
+
     end
 
     class DoAdapter < AbstractAdapter
@@ -29,6 +59,7 @@ module ActiveRecord
         super(nil, logger)
         @uri = uri
         @config = config
+        @quoted_column_names, @quoted_table_names = {}, {}
         connect
       end
 
@@ -42,11 +73,25 @@ module ActiveRecord
 
       # QUOTING ==================================================
       def quote(value, column = nil)
-        @connection.quote_value(value)
+        # DataObjects quoting is not compatible with ActiveRecord
+        # @connection.quote_value(value)
+        super
       end
 
       def quote_string(value)
-        value.gsub("'", "''")
+        if @connection.quote_string(value) =~ /\A'(.*)'\Z/
+          $1
+        else
+          raise ArgumentError, "DataObjects failed to quote string #{value.inspect}"
+        end
+      end
+
+      def quote_column_name(name) #:nodoc:
+        @quoted_column_names[name] ||= "\"#{name}\""
+      end
+
+      def quote_table_name(name) #:nodoc:
+        @quoted_table_names[name] ||= quote_column_name(name).gsub('.', '"."')
       end
 
 
@@ -122,6 +167,7 @@ module ActiveRecord
       protected
 
       def translate_exception(exception, message)
+        super
       end
 
       # Returns an array of record hashes with the column names as keys and
@@ -134,7 +180,7 @@ module ActiveRecord
           begin
             while reader.next!
               i = -1
-              rows << Hash[*reader.values.map{|v| i+=1; [fields[i], v]}.flatten]
+              rows << Hash[*reader.values.map{|v| i+=1; [fields[i], typecast_value(v)]}.flatten]
             end
           ensure
             reader.close
@@ -156,6 +202,15 @@ module ActiveRecord
       end
 
       private
+      
+      # typecast selected DataObjects value to value that will be passed to ActiveRecord
+      def typecast_value(value)
+        case value
+        # always translate DataObjects ByteArray to String to avoid failing tests
+        when Extlib::ByteArray then value.to_s
+        else value
+        end
+      end
 
       def connect
         @connection = DataObjects::Connection.new(@uri)

@@ -74,11 +74,6 @@ module ActiveRecord
 
       QUOTED_TRUE, QUOTED_FALSE = '1'.freeze, '0'.freeze
 
-      def initialize(uri, logger, config)
-        super
-        @quoted_column_names, @quoted_table_names = {}, {}
-      end
-
       def adapter_name #:nodoc:
         'DoMySQL'
       end
@@ -107,12 +102,23 @@ module ActiveRecord
 
       # QUOTING ==================================================
 
-      def quote_column_name(name) #:nodoc:
-        @quoted_column_names[name] ||= "`#{name}`"
+      def quote(value, column = nil)
+        if value.kind_of?(String) && column && column.type == :binary && column.class.respond_to?(:string_to_binary)
+          s = column.class.string_to_binary(value).unpack("H*")[0]
+          "x'#{s}'"
+        elsif value.kind_of?(BigDecimal)
+          value.to_s("F")
+        else
+          super
+        end
       end
 
-      def quote_table_name(name) #:nodoc:
-        @quoted_table_names[name] ||= quote_column_name(name).gsub('.', '`.`')
+      def quoted_true
+        QUOTED_TRUE
+      end
+
+      def quoted_false
+        QUOTED_FALSE
       end
 
       # REFERENTIAL INTEGRITY ====================================
@@ -346,11 +352,29 @@ module ActiveRecord
       protected
 
       def translate_exception(exception, message)
-        super
+        case exception
+        when DataObjects::SQLError
+          case exception.code
+          when 1062
+            RecordNotUnique.new(message, exception)
+          when 1452
+            InvalidForeignKey.new(message, exception)
+          else
+            super
+          end
+        else
+          super
+        end
       end
 
       private
 
+      def column_for(table_name, column_name)
+        unless column = columns(table_name).find { |c| c.name == column_name.to_s }
+          raise "No such column: #{table_name}.#{column_name}"
+        end
+        column
+      end
 
     end
   end
