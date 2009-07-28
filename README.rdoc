@@ -8,17 +8,35 @@ This is experimental ActiveRecord DataObjects adapter.
 It uses DataObjects drivers to access database.
 Currently experimental MySQL DataObjects adapter is created.
 
-== FEATURES/PROBLEMS:
+== FEATURES:
 
-* FIX (list of features or problems)
+* TODO: describe
 
-== SYNOPSIS:
+== PROBLEMS:
 
-  FIX (code sample of usage)
+* some ActiveRecord unit tests are failing because ActiveRecord expects strings in _before_type_cast but DataObjects adapter returns already typecasted values
+* Extlib pluralization is overwriting ActiveSupport pluralization and is not compatible with it
+* quoting should be improved to use DataObjects quoting as much as possible
+* need to investigate other ActiveRecord unit test failures...
+
+== HOW TO RUN TESTS:
+
+DataObjects adapter has some initial set of RSpec tests which can help to get basic adapter functionality to be implemented.
+After that it is supposed that ActiveRecord unit tests will be run.
+
+To run ActiveRecord unit tests
+* clone git://github.com/rails/rails.git in the same parent directory where you have this repository (meaning that ../rails/activerecord should point to ActiveRecord base directory)
+* see ../rails/activerecord/RUNNING_UNIT_TESTS about how to setup test databases
+* run basic adapter tests:
+    rake test_mysql TEST=test/cases/adapter_test.rb
+    rake test_mysql TEST=test/cases/base_test.rb
+* or run all set of tests
+    rake test_mysql
+* if you need to modify initial test setup then edit test/connections/native_mysql/connection.rb
 
 == REQUIREMENTS:
 
-* FIX (list of requirements)
+* data_objects version 0.10.0 and corresponding DataObjects driver gems should be installed
 
 == INSTALL:
 
