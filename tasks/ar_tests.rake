@@ -17,7 +17,7 @@ task :load_ar_test_env do
     Rake::TestTask.new("test_#{adapter}_original") do |t|
       connection_path = "#{do_adapter_dir}/test/connections/native_#{adapter}"
       adapter_short = adapter[/^[a-z]+/]
-      t.libs << "test" << connection_path
+      t.libs << "test" << do_adapter_dir << connection_path
       t.test_files=Dir.glob( "test/cases/**/*_test{,_#{adapter_short}}.rb" ).sort
       t.verbose = true
     end
