@@ -72,10 +72,28 @@ module ActiveRecord
       cattr_accessor :emulate_booleans
       self.emulate_booleans = true
 
+      ADAPTER_NAME = 'DoMySQL'.freeze
+
       QUOTED_TRUE, QUOTED_FALSE = '1'.freeze, '0'.freeze
 
+      NATIVE_DATABASE_TYPES = {
+        :primary_key => "int(11) DEFAULT NULL auto_increment PRIMARY KEY".freeze,
+        :string      => { :name => "varchar", :limit => 255 },
+        :text        => { :name => "text" },
+        :integer     => { :name => "int", :limit => 4 },
+        :float       => { :name => "float" },
+        :decimal     => { :name => "decimal" },
+        :datetime    => { :name => "datetime" },
+        :timestamp   => { :name => "datetime" },
+        :time        => { :name => "time" },
+        :date        => { :name => "date" },
+        :binary      => { :name => "blob" },
+        :boolean     => { :name => "tinyint", :limit => 1 }
+      }
+
+
       def adapter_name #:nodoc:
-        'DoMySQL'
+        ADAPTER_NAME
       end
 
       def supports_savepoints? #:nodoc:
@@ -83,22 +101,8 @@ module ActiveRecord
       end
 
       def native_database_types #:nodoc:
-        {
-          :primary_key => "int(11) DEFAULT NULL auto_increment PRIMARY KEY".freeze,
-          :string      => { :name => "varchar", :limit => 255 },
-          :text        => { :name => "text" },
-          :integer     => { :name => "int", :limit => 4 },
-          :float       => { :name => "float" },
-          :decimal     => { :name => "decimal" },
-          :datetime    => { :name => "datetime" },
-          :timestamp   => { :name => "datetime" },
-          :time        => { :name => "time" },
-          :date        => { :name => "date" },
-          :binary      => { :name => "blob" },
-          :boolean     => { :name => "tinyint", :limit => 1 }
-        }
+        NATIVE_DATABASE_TYPES
       end
-
 
       # QUOTING ==================================================
 
@@ -106,8 +110,6 @@ module ActiveRecord
         if value.kind_of?(String) && column && column.type == :binary && column.class.respond_to?(:string_to_binary)
           s = column.class.string_to_binary(value).unpack("H*")[0]
           "x'#{s}'"
-        elsif value.kind_of?(BigDecimal)
-          value.to_s("F")
         else
           super
         end

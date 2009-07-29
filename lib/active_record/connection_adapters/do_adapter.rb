@@ -1,6 +1,8 @@
 require 'active_record/connection_adapters/abstract_adapter'
 require 'data_objects'
 
+require File.dirname(__FILE__) + '/do_adapter_core_ext.rb'
+
 module ActiveRecord
   class Base
     # Establishes a connection to the database that's used by all Active Record objects.
@@ -42,11 +44,14 @@ module ActiveRecord
       # Convert DataObjects returned value to time
       def self.string_to_time(value)
         if value.is_a?(DateTime)
-          begin
-            return value.to_time
-          rescue ArgumentError
-            return value
-          end
+          # begin
+          #   return value.to_time
+          # rescue ArgumentError
+          #   return value
+          # end
+
+          # recreate DateTime with time zone determined by ActiveRecord
+          return new_time(value.year, value.mon, value.mday, value.hour, value.min, value.sec, 0)
         end
         super
       end
