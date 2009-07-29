@@ -96,7 +96,7 @@ module ActiveRecord
       cattr_accessor :emulate_booleans
       self.emulate_booleans = true
 
-      ADAPTER_NAME = 'DoMySQL'.freeze
+      ADAPTER_NAME = 'MySQL'.freeze
 
       QUOTED_TRUE, QUOTED_FALSE = '1'.freeze, '0'.freeze
 
