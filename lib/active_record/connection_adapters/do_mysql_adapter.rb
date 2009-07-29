@@ -203,14 +203,14 @@ module ActiveRecord
       #   create_database 'matt_development', :charset => :big5
       def create_database(name, options = {})
         if options[:collation]
-          execute "CREATE DATABASE `#{name}` DEFAULT CHARACTER SET `#{options[:charset] || 'utf8'}` COLLATE `#{options[:collation]}`"
+          execute "CREATE DATABASE \"#{name}\" DEFAULT CHARACTER SET \"#{options[:charset] || 'utf8'}\" COLLATE \"#{options[:collation]}\""
         else
-          execute "CREATE DATABASE `#{name}` DEFAULT CHARACTER SET `#{options[:charset] || 'utf8'}`"
+          execute "CREATE DATABASE \"#{name}\" DEFAULT CHARACTER SET \"#{options[:charset] || 'utf8'}\""
         end
       end
 
       def drop_database(name) #:nodoc:
-        execute "DROP DATABASE IF EXISTS `#{name}`"
+        execute "DROP DATABASE IF EXISTS \"#{name}\""
       end
 
       def current_database

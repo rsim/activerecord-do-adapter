@@ -1,4 +1,4 @@
-print "Using native MySQL\n"
+print "Using DataObjects MySQL driver\n"
 require_dependency 'models/course'
 require 'logger'
 
