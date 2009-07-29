@@ -62,5 +62,14 @@ ActiveRecord::Base.connection.class.class_eval do
   alias_method_chain :select, :query_record
 
 end
+
+# pluralization exceptions for ActiveRecord tests
+# Extlib::Inflection.word "smarts", "smarts"
+# Extlib::Inflection.word "virus", "viri"
+
+# Override Extlib pluralization with ActiveSupport pluralization
+# works in master branch of ActiveSupport
+load "active_support/core_ext/string/inflections.rb"
+
 # =============================================
 
