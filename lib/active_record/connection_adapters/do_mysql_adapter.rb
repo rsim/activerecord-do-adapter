@@ -21,6 +21,20 @@ module ActiveRecord
 
   module ConnectionAdapters
     class DoMysqlColumn < DoColumn #:nodoc:
+      def extract_default(default)
+        if type == :binary || type == :text
+          if default.blank?
+            return null ? nil : ''
+          else
+            raise ArgumentError, "#{type} columns cannot have a default value: #{default.inspect}"
+          end
+        elsif missing_default_forged_as_empty_string?(default)
+          nil
+        else
+          super
+        end
+      end
+
       def has_default?
         return false if type == :binary || type == :text #mysql forbids defaults on blob and text columns
         super
@@ -57,6 +71,16 @@ module ActiveRecord
         end
       end
 
+      # MySQL misreports NOT NULL column default when none is given.
+      # We can't detect this for columns which may have a legitimate ''
+      # default (string) but we can for others (integer, datetime, boolean,
+      # and the rest).
+      #
+      # Test whether the column has default '', is not null, and is not
+      # a type allowing default ''.
+      def missing_default_forged_as_empty_string?(default)
+        type != :string && !null && default == ''
+      end
     end
 
     class DoMysqlAdapter < DoAdapter

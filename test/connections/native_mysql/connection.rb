@@ -16,6 +16,13 @@ ActiveRecord::ConnectionAdapters::DoMysqlAdapter.class_eval do
   include ActiveRecord::ConnectionAdapters::MysqlAdapter
 end
 
+# used in ActiveRecord defaults_test.rb
+class Mysql
+  def self.client_version
+    50083
+  end
+end
+
 DataObjects::Mysql::Connection.instance_eval do
   def pool_size
     100
