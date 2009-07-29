@@ -66,6 +66,7 @@ end
 # pluralization exceptions for ActiveRecord tests
 # Extlib::Inflection.word "smarts", "smarts"
 # Extlib::Inflection.word "virus", "viri"
+# Extlib::Inflection.word "replies", "replies"
 
 # Override Extlib pluralization with ActiveSupport pluralization
 # works in master branch of ActiveSupport
