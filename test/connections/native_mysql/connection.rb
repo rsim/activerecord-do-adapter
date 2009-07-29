@@ -12,6 +12,9 @@ module ActiveRecord::ConnectionAdapters::MysqlAdapter
   #   super
   # end
 end
+ActiveRecord::ConnectionAdapters::DoMysqlAdapter.class_eval do
+  include ActiveRecord::ConnectionAdapters::MysqlAdapter
+end
 
 DataObjects::Mysql::Connection.instance_eval do
   def pool_size
