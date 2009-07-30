@@ -84,7 +84,7 @@ module ActiveRecord
       end
 
       def quote_string(value)
-        if @connection.quote_string(value) =~ /\A'(.*)'\Z/
+        if @connection.quote_string(value) =~ /\A'(.*)'\Z/m
           $1
         else
           raise ArgumentError, "DataObjects failed to quote string #{value.inspect}"

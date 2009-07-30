@@ -7,7 +7,7 @@ module ActiveRecord
     def self.do_mysql_connection(config) # :nodoc:
       config = config.symbolize_keys
       scheme   = 'mysql'
-      host     = config[:host]
+      host     = config[:host] || 'localhost'
       port     = config[:port]
       username = config[:username]
       password = config[:password]

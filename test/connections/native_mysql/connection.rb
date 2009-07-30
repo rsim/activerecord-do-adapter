@@ -3,7 +3,6 @@ require_dependency 'models/course'
 require 'logger'
 
 # ========== for DataObjects adapter ==========
-# gem "activerecord-do-adapter"
 $:.unshift("../../activerecord-do-adapter/lib")
 require "active_record/connection_adapters/do_mysql_adapter"
 
