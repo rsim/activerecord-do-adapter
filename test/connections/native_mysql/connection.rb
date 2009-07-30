@@ -69,6 +69,8 @@ ActiveRecord::Base.connection.class.class_eval do
 
 end
 
+# DataObjects::Mysql.logger = DataObjects::Logger.new('do.log', :debug)
+
 # pluralization exceptions for ActiveRecord tests
 # Extlib::Inflection.word "smarts", "smarts"
 # Extlib::Inflection.word "virus", "viri"
