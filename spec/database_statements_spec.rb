@@ -53,6 +53,13 @@ describe "Database statements" do
       @connection.select_value("SELECT title FROM posts WHERE id = #{insert_id}").should == "Title 3 updated"
     end
 
+    it "should not update non-existing row" do
+      updated_rows = @connection.update <<-SQL
+        UPDATE posts SET title = 'Title -1 updated' WHERE id = -1
+      SQL
+      updated_rows.should == 0
+    end
+
     it "should delete row" do
       insert_id = @connection.insert <<-SQL
         INSERT INTO posts (title) VALUES ('Title 4')
