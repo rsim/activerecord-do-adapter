@@ -388,6 +388,20 @@ module ActiveRecord
           else
             super
           end
+        # JDBC driver has not yet implemented DataObjects::SQLError
+        when MysqlError
+          if exception.message =~ /vendor_errno=(\d+)/
+            case $1.to_i
+            when 1062
+              RecordNotUnique.new(message, exception)
+            when 1452
+              InvalidForeignKey.new(message, exception)
+            else
+              super
+            end
+          else
+            super
+          end
         else
           super
         end
