@@ -22,19 +22,26 @@ class MysqlConnectionTest < ActiveRecord::TestCase
   #   end
   # end
 
-  def test_automatic_reconnection_after_timeout
-    assert @connection.active?
-    @connection.update('set @@wait_timeout=1')
-    sleep 2
-    assert @connection.active?
-  end
+  if RUBY_PLATFORM =~ /java/
+    # DO JDBC driver will reconnect after verifying if connection is active
+    def test_no_automatic_reconnection_after_timeout
+      assert @connection.active?
+      @connection.update('set @@wait_timeout=1')
+      sleep 2
+      assert !@connection.active?
+    end
 
-  # def test_no_automatic_reconnection_after_timeout
-  #   assert @connection.active?
-  #   @connection.update('set @@wait_timeout=1')
-  #   sleep 2
-  #   assert !@connection.active?
-  # end
+  else
+
+    # DO C driver will reconnect before verifying if connection is active
+    def test_automatic_reconnection_after_timeout
+      assert @connection.active?
+      @connection.update('set @@wait_timeout=1')
+      sleep 2
+      assert @connection.active?
+    end
+
+  end
 
   def test_successful_reconnection_after_timeout_with_manual_reconnect
     assert @connection.active?
