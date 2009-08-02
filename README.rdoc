@@ -4,20 +4,25 @@
 
 == DESCRIPTION:
 
-This is experimental ActiveRecord DataObjects adapter.
+This is ActiveRecord DataObjects adapter.
 It uses DataObjects drivers to access database.
-Currently experimental MySQL DataObjects adapter is created.
+Currently MySQL DataObjects adapter is created.
 
-== FEATURES:
+== USAGE / FEATURES:
 
-* TODO: describe
+In database.yml just replace e.g. "mysql" with "do_mysql"
 
-== PROBLEMS:
+DataObjects MySQL adapter differences from original MySQL adapter:
+* _before_type_cast return already corresponding Ruby type for table column (e.g. Fixnum, Float, DateTime, String ...) and not always String, as original adapter
+* calculation results (e.g. SUM(column) or COUNT(*)) are returned as numeric results and not strings
+* table and column name quoting is done with double quotes and not backquotes
+* connection.exec cannot be done with SELECT statements
+* auto reconnection is turned on by default and cannot be turned off
 
-* some ActiveRecord unit tests are failing because ActiveRecord expects strings in _before_type_cast but DataObjects adapter returns already typecasted values
-* Extlib pluralization is overwriting ActiveSupport pluralization and is not compatible with it
-* quoting should be improved to use DataObjects quoting as much as possible
-* need to investigate other ActiveRecord unit test failures...
+== TODO / PROBLEMS:
+
+* Extlib pluralization is overwriting ActiveSupport pluralization and is not compatible with it - currently there is workaround which loads ActiveSupport one more time, need to change DataObjects not to require Extlib pluralization
+* need to investigate how to pass bind parameters from ActiveRecord to adapter
 
 == HOW TO RUN TESTS:
 
@@ -37,6 +42,7 @@ To run ActiveRecord unit tests
 == REQUIREMENTS:
 
 * data_objects version 0.10.0 and corresponding DataObjects driver gems should be installed
+* now is tested with Ruby 1.8.6, Ruby 1.9.1 and JRuby 1.3.1
 
 == INSTALL:
 
