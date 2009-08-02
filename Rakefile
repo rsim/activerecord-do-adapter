@@ -14,7 +14,9 @@ $hoe = Hoe.spec 'activerecord-do-adapter' do
   self.developer 'Raimonds Simanovskis', 'raimonds.simanovskis@gmail.com'
   self.rubyforge_name       = self.name # TODO this is default value
   self.extra_deps         = [['data_objects','>= 0.10.0']]
-
+  if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby' && RUBY_VERSION >= '1.9'
+    self.extra_deps << ['unicode_utils', '>=1.0.0']
+  end
 end
 
 require 'newgem/tasks'

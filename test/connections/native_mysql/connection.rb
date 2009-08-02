@@ -42,7 +42,7 @@ ActiveRecord::Base.configurations = {
     :adapter  => 'do_mysql',
     :username => 'rails',
     :encoding => 'utf8',
-    :database => 'activerecord_unittest',
+    :database => 'activerecord_unittest'
   },
   'arunit2' => {
     :adapter  => 'do_mysql',

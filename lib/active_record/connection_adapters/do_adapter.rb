@@ -105,6 +105,7 @@ module ActiveRecord
       # CONNECTION MANAGEMENT ====================================
 
       def active?
+        return false if @active == false
         reader = @connection.create_command(active_select_statement).execute_reader
         reader.close
         true
@@ -115,10 +116,13 @@ module ActiveRecord
       def reconnect!
         disconnect!
         connect
+        @active = true
       end
 
       def disconnect!
+        @connection.detach
         @connection.dispose rescue nil
+        @active = false
       end
 
       # DATABASE STATEMENTS ======================================

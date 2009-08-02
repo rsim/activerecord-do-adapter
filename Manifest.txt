@@ -3,6 +3,7 @@ Manifest.txt
 README.rdoc
 Rakefile
 lib/active_record/connection_adapters/do_adapter.rb
+lib/active_record/connection_adapters/do_adapter_core_ext.rb
 lib/active_record/connection_adapters/do_mysql_adapter.rb
 lib/activerecord-do-adapter.rb
 spec/connection_spec.rb
@@ -12,4 +13,3 @@ spec/schema_statements_spec.rb
 spec/spec.opts
 spec/spec_helper.rb
 spec/transactions_spec.rb
-tasks/rspec.rake
